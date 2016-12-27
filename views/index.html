@@ -2,11 +2,44 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>8-Bit Inventory Launchpad</title>
+    <title>8-Bit Inventory</title>
+    <link rel="stylesheet" href="css/master.css">
     <script src="vendors/jquery-3.0.0.min.js" charset="utf-8"></script>
     <script src="scripts/8bitInventory.js" charset="utf-8"></script>
   </head>
   <body>
-    <h1>8-Bit Inventory Launchpad</h1>
+    <h1>8-Bit Inventory</h1>
+    <div id='right-section'>
+        <h2>Add Item</h2>
+        <input type="text" id='nameIn' placeholder="item name" />
+        <!-- <input type="text" id='colorIn' placeholder="item color" />
+        <input type="text" id='sizeIn' placeholder="item size" /> -->
+        <select id='colorIn'>  </select>
+        <select id='sizeIn'>  </select>
+        <br><button id="sellItem" >Submit Item</button>
+
+
+      <div class="buying searchName">
+        <h2>Search Items</h2>
+        <h3>Search by Name</h3>
+        <input type="text" id="nameOption" placeholder="item name" />
+      </div>
+
+      <h3>-- or --</h3>
+      <h3>Search by Type</h3>
+        <select id="colorOption">  </select>
+        <select id="sizeOption">  </select>
+        <br><button id="searchitems" >Search</button>
+  </div>
+
+  <div id="left-section">
+    <div class="searchResults"></div>
+
+    <div class="inventory">
+      <h2>Items in Inventory</h2>
+      <div id="outputText"></div>
+    </div>
+  </div>
+
   </body>
 </html>

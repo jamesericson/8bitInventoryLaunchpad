@@ -3,7 +3,9 @@ var app = express();
 var path = require( 'path' );
 var bodyParser = require( 'body-parser' );
 var urlEncodedParser = bodyParser.urlencoded( { extended: false } );
+var pg = require( 'pg' );
 var port = process.env.PORT || 3003;
+var connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/inventory'
 
 // spin up server
 app.listen( port, function(){
@@ -16,16 +18,47 @@ app.get( '/', function( req, res ){
   res.sendFile( path.resolve( 'views/index.html' ) );
 }); // end home base
 
+
 // add new objects to the inventory
 app.post( '/addItem', urlEncodedParser, function( req, res ){
   console.log( 'addItem route hit:', req.body );
-  // add the item from req.body to the table
+  // connect to db
+  pg.connect(connectionString, function( err, client, done ){
+    if (err){
+      console.log(err);
+    } else {
+      console.log('connected to DB');
+      client.query( 'INSERT INTO storeInventory (name, color, size) VALUES ($1, $2, $3)', [req.body.name, req.body.color, req.body.size]);
+      done();
+      res.send('coolio');
+    } // end if else
+  });// end connect
+
 }); // end addItem route
 
 // get all objects in the inventory
 app.get( '/getInventory', function( req, res ){
   console.log( 'getInventory route hit' );
-  // get all items in the table and return them to client
+  // connect to DB
+  pg.connect(connectionString, function(err, client, done){
+    if(err){
+      console.log(err);
+    } else {
+      console.log('connected to DB');
+      var query = client.query( 'SELECT * FROM storeInventory');
+      //array for list
+      var allInventory = [];
+      query.on( 'row', function( row ){
+        allInventory.push (row);
+      });
+      query.on( 'end', function(){
+      done();
+      console.log( allInventory);
+
+      res.send( allInventory);
+      });
+    }//end if else
+  })// end connect
 }); // end addItem route
 
 // static folder
