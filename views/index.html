@@ -9,30 +9,42 @@
   </head>
   <body>
     <h1>8-Bit Inventory</h1>
-    <div id='right-section'>
-        <h2>Add Item</h2>
-        <input type="text" id='nameIn' placeholder="item name" />
-        <!-- <input type="text" id='colorIn' placeholder="item color" />
-        <input type="text" id='sizeIn' placeholder="item size" /> -->
-        <select id='colorIn'>  </select>
-        <select id='sizeIn'>  </select>
-        <br><button id="sellItem" >Submit Item</button>
+    <div id='left-section'>
 
-
-      <div class="buying searchName">
+      <div id="search">
         <h2>Search Items</h2>
-        <h3>Search by Name</h3>
+        <div id="searchOptions">
+          <h3>by name</h3>
+          <h3>|</h3>
+          <h3>by type</h3>
+        </div>
         <input type="text" id="nameOption" placeholder="item name" />
+
+        <h3>-- or --</h3>
+
+          <select id="colorOption">  </select>
+          <br><select id="sizeOption">  </select>
+          <br><br><button id="searchitems" >Search</button>
       </div>
 
-      <h3>-- or --</h3>
-      <h3>Search by Type</h3>
-        <select id="colorOption">  </select>
-        <select id="sizeOption">  </select>
-        <br><button id="searchitems" >Search</button>
+      <div id="add">
+        <h2>Add Item</h2>
+        <input type="text"  id='nameIn' placeholder="item name" />
+        <!-- <input type="text" id='colorIn' placeholder="item color" />
+        <input type="text" id='sizeIn' placeholder="item size" /> -->
+        <br><select id='colorIn'>  </select>
+        <br><select id='sizeIn'>  </select>
+        <br><br><button id="sellItem" >Submit</button>
+      </div>
+
+      <div id="delete">
+        <h2>Delete Item</h2>
+        <input type="text" id='deleteName' placeholder="item name" />
+        <br><br><button id="deleteItems" >Delete</button>
+      </div>
   </div>
 
-  <div id="left-section">
+  <div id="right-section">
     <div class="searchResults"></div>
 
     <div class="inventory">

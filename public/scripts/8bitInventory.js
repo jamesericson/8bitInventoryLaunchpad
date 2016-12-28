@@ -104,13 +104,16 @@ var displayObjects = function(itemArray){
 };//end displayItems()
 
 var userAdd = function(){
+  var colorIn = $('#colorIn').val();
+  var nameIn = ('#nameIn').val();
+  var sizeIn = $('#sizeIn').val();
+
+  if ( colorIn == '' || nameIn == NULL || sizeIn == NULL){
+    if (color == '')$
+  }
   $('.searchResults').hide()
 
-  addObject(
-    $('#colorIn').val(),
-    $('#nameIn').val(),
-    $('#sizeIn').val()
-  );
+  addObject( colorIn, nameIn, sizeIn );
 
   $('input').val('');
   $('select').val('NULL');
