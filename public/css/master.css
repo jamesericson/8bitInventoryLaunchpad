@@ -56,6 +56,12 @@ h3 {
   margin: 10px 3px;
 }
 
+.errorMessage {
+  color: red;
+  font-size: 10px;
+  margin-bottom: 1px;
+}
+
 .inventory {
   background-color: #aaaaaa;
   padding: 10px 0;

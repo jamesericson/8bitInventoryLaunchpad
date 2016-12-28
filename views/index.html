@@ -18,28 +18,40 @@
           <h3>|</h3>
           <h3>by type</h3>
         </div>
+
+        <p class="errorMessage" id="errorNameOption"></p>
         <input type="text" id="nameOption" placeholder="item name" />
 
         <h3>-- or --</h3>
-
+          <p class="errorMessage" id="errorNameOption"></p>
           <select id="colorOption">  </select>
-          <br><select id="sizeOption">  </select>
-          <br><br><button id="searchitems" >Search</button>
+          <br>
+          <p class="errorMessage" id="errorSizeOption"></p>
+          <select id="sizeOption">  </select>
+          <br><br>
+          <button id="searchItems" >Search</button>
       </div>
 
       <div id="add">
         <h2>Add Item</h2>
+        <p class="errorMessage" id="errorNameIn"></p>
         <input type="text"  id='nameIn' placeholder="item name" />
         <!-- <input type="text" id='colorIn' placeholder="item color" />
         <input type="text" id='sizeIn' placeholder="item size" /> -->
-        <br><select id='colorIn'>  </select>
-        <br><select id='sizeIn'>  </select>
-        <br><br><button id="sellItem" >Submit</button>
+        <br>
+        <p class="errorMessage" id="errorColorIn"></p>
+        <select id='colorIn'>  </select>
+        <br>
+        <p class="errorMessage" id="errorSizeIn"></p>
+        <select id='sizeIn'>  </select>
+        <br><br>
+        <button id="sellItem" >Submit</button>
       </div>
 
       <div id="delete">
         <h2>Delete Item</h2>
-        <input type="text" id='deleteName' placeholder="item name" />
+        <p class="errorMessage" id="errorDeleteName"></p>
+        <!-- <input type="text" id='deleteName' placeholder="item name" /> -->
         <br><br><button id="deleteItems" >Delete</button>
       </div>
   </div>

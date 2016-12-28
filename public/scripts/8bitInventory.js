@@ -104,12 +104,16 @@ var displayObjects = function(itemArray){
 };//end displayItems()
 
 var userAdd = function(){
+  $('.errorMessage').text('');
   var colorIn = $('#colorIn').val();
-  var nameIn = ('#nameIn').val();
+  var nameIn = $('#nameIn').val();
   var sizeIn = $('#sizeIn').val();
 
-  if ( colorIn == '' || nameIn == NULL || sizeIn == NULL){
-    if (color == '')$
+  if ( colorIn == 'NULL' || nameIn == '' || sizeIn == 'NULL'){
+    if (colorIn == 'NULL')$('#errorColorIn').text('ERROR: missing item color');
+    if (nameIn == '')$('#errorNameIn').text('ERROR: missing item name');
+    if (sizeIn == 'NULL')$('#errorSizeIn').text('ERROR: missing item size');
+    return;
   }
   $('.searchResults').hide()
 
@@ -121,6 +125,8 @@ var userAdd = function(){
 };// end userAdd()
 
 var userSearch = function(){
+  $('.errorMessage').text('');
+
   findObject(
     $('#colorOption').val(),
     $('#sizeOption').val()
@@ -129,6 +135,19 @@ var userSearch = function(){
   $('select').val('NULL');
 
 };// end userSearch()
+
+var userDelete = function() {
+  $('.errorMessage').text('');
+  var deleteName = $('#deleteName').val();
+
+  if (deleteName == ''){
+    $('#errorDeleteName').text('ERROR: missing item name');
+    return;
+  }
+
+  console.log('deleting... (maybe)');
+  $('input').val('');
+}// end userDelete()
 
 var init = function(){
   ////when doc is ready////
@@ -143,6 +162,7 @@ var init = function(){
 
 var eventlisteners = function(){
   $('#sellItem').on('click', userAdd);
-  $('#searchitems').on('click', userSearch);
+  $('#searchItems').on('click', userSearch);
+  $('#deleteItems').on('click', userDelete);
 
 }; // end eventlisteners()
