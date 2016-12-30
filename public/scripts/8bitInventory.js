@@ -78,6 +78,17 @@ var findObject = function( colorCheck, sizeCheck ){
   displayFoundObjects(matches);
 }; // end findObject
 
+var findNamedObject = function( nameCheck ){
+  var matches = [];
+  for ( var i = 0; i < items.length; i++ ) {
+    if( items[i].name == nameCheck ){
+      // match, add to array
+      matches.push( items[i] );
+    } // end if
+  } // end for
+  displayFoundObjects(matches);
+}; // end findNamedObject()
+
 var deleteObject = function( objectName ){
   console.log('in deleteObject: deleting = ', {name: objectName});
   $.ajax({
@@ -170,10 +181,21 @@ var userAdd = function(){
 var userSearch = function(){
   $('.errorMessage').text('');
 
-  findObject(
-    $('#colorOption').val(),
-    $('#sizeOption').val()
-  );
+  if ($('#searchItems').attr('data') === 'name'){
+    console.log('searching by name');
+    if ($('#nameOption').val() === ''){
+      $('#errorNameOption').text('ERROR: missing item name');
+      return;
+    }
+    findNamedObject( $('#nameOption').val() );
+  }else{
+    console.log('searching by type');
+    findObject(
+      $('#colorOption').val(),
+      $('#sizeOption').val()
+    );
+  }//end if else
+
   $('input').val('');
   $('select').val('NULL');
 
@@ -196,10 +218,7 @@ var userDelete = function() {
 }// end userDelete()
 
 var setSearchAs = function(){
-  var here = $( this ).attr( 'name' );
-  console.log('clicked search option', here );
-
-
+  $('.errorMessage').text('');
   $('.searchBy').addClass('notSelectedOption');
   $( this ).removeClass('notSelectedOption');
 
@@ -225,11 +244,9 @@ var setSearchAs = function(){
 
 var init = function(){
   ////when doc is ready////
-
+  // set search to 'by type'
   $('#searchByName').hide();
   $('#nameOption').hide();
-
-
   // hide search area
   $('.searchResults').hide();
   // get objects
