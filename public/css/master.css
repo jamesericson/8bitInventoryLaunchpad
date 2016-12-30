@@ -45,15 +45,23 @@ h1 {
   padding-bottom: 20px;
   width: 80%;
   border-bottom: 1px solid black;
-
 }
+
 
 #searchOptions {
   display: inline-flex;
 }
 
-h3 {
+#searchOptions h3 {
   margin: 10px 3px;
+}
+
+.notSelectedOption {
+  color: white;
+}
+
+.notSelectedOption:hover {
+  color: blue;
 }
 
 .errorMessage {

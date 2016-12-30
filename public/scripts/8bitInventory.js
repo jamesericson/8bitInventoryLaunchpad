@@ -1,6 +1,8 @@
 // properties by which searches can be done
-var sizes = [ 'small', 'medium', 'large'];
-var colors = [ 'red', 'orange', 'yellow', 'green', 'mermaid treasure', 'blue', 'purple' ];
+// add _ in place of a space inorder to retain information in the DB
+// app uses function addSpaces to replace "_" with " " for DOM use
+var sizes = [ 'small', 'medium', 'large', 'extra_large'];
+var colors = [ 'red', 'orange', 'yellow', 'green', 'mermaid_treasure', 'blue', 'purple' ];
 
 ////// global array of items in inventory //////
 var items = [];
@@ -9,38 +11,53 @@ $( document ).ready( function(){
   init();
 }); // end doc ready
 
+var addUnderscore = function(word){
+  for (var i = 0; i < word.length; i++) {
+    if (word[i] == ' ') {
+      word = word.substr(0,i) + '_' + word.substr(i+1)
+    }// end if
+  } // end for
+  return word;
+};// end addUnderscore()
+
+var addSpaces = function(word){
+  for (var i = 0; i < word.length; i++) {
+    if (word[i] == '_') {
+      word = word.substr(0,i) + ' ' + word.substr(i+1)
+    }// end if
+  } // end for
+  return word;
+}; // end addSpaces()
+
 var setUpOptions = function(){
   var outputText = '<option value=NULL>--Select a Color--</option>';
   for (var i = 0; i < colors.length; i++) {
-    outputText += '<option value=' + colors[i] + '>' + colors[i] + '</option>';
-  }
+    outputText += '<option value=' + colors[i] + '>' + addSpaces(colors[i]) + '</option>';
+  } // end for
   $('#colorIn, #colorOption').html(outputText);
 
   outputText = '<option value=NULL>--Select a Size--</option>';
   for (var i = 0; i < sizes.length; i++) {
-    outputText += '<option value=' + sizes[i] + '>' + sizes[i] + '</option>';
-  }
+    outputText += '<option value=' + sizes[i] + '>' + addSpaces(sizes[i]) + '</option>';
+  } // end for
   $('#sizeIn, #sizeOption' ).html(outputText);
 
 };//end setUpOptions();
 
 var addObject = function( colorIn, nameIn, sizeIn ){
-  console.log( 'in addObject' );
-  // assemble object from new fields
-  var newItem = {
-    color: colorIn,
-    name: nameIn,
-    size: sizeIn
-  }; // end testObject
-  console.log( 'adding:', newItem );
+  console.log( 'in addObject: adding ', nameIn);
+
   $.ajax({
     type: 'POST',
     url: '/addItem',
-    data: newItem,
+    data: {
+      color: colorIn,
+      name: nameIn,
+      size: sizeIn
+    },
     success: function(response){
       console.log('back from server with: ', response);
-      items.push( newItem );
-      displayObjects(items);
+      getObjects();
     },
     error: function(err){
       console.log('back from server with error: ', err);
@@ -60,6 +77,22 @@ var findObject = function( colorCheck, sizeCheck ){
   } // end for
   displayFoundObjects(matches);
 }; // end findObject
+
+var deleteObject = function( objectName ){
+  console.log('in deleteObject: deleting = ', {name: objectName});
+  $.ajax({
+    type: 'POST',
+    url: '/deleteItem',
+    data: {name: objectName},
+    success: function(response){
+      console.log(response);
+      getObjects();
+    },
+    error: function (err) {
+      console.log(err);
+    }
+  });//end ajax
+}// end deleteObject()
 
 var displayFoundObjects = function(itemArray){
   $('.searchResults').slideUp( function(){
@@ -87,6 +120,7 @@ var getObjects = function(){
       console.log(response);
       items = response;
       displayObjects(response);
+      updateDeleteOptions(response);
     },
     error: function (err) {
       console.log(err);
@@ -97,11 +131,20 @@ var getObjects = function(){
 var displayObjects = function(itemArray){
   var outputText = '<ul>';
   for (var i = 0; i < itemArray.length; i++) {
-    outputText += '<li>a ' + itemArray[i].size + ' ' + itemArray[i].color + ' ' + itemArray[i].name + '</li>';
+    outputText += '<li>a ' + addSpaces(itemArray[i].size) + ' ' + addSpaces(itemArray[i].color) + ' ' + itemArray[i].name + '</li>';
   }
   outputText += '</ul>';
   $('#outputText').html(outputText);
 };//end displayItems()
+
+var updateDeleteOptions = function(itemArray){
+  var outputText = '<option value=NULL>--Select a Name--</option>';
+  for (var i = 0; i < itemArray.length; i++) {
+    outputText += '<option value=' + addUnderscore(itemArray[i].name) + '>' + itemArray[i].name + '</option>';
+  }
+  $('#deleteName').html(outputText);
+
+}// end updateDeleteOptions()
 
 var userAdd = function(){
   $('.errorMessage').text('');
@@ -140,17 +183,53 @@ var userDelete = function() {
   $('.errorMessage').text('');
   var deleteName = $('#deleteName').val();
 
-  if (deleteName == ''){
+  if (deleteName == 'NULL'){
     $('#errorDeleteName').text('ERROR: missing item name');
     return;
   }
+  console.log('to be deleted: ', deleteName);
+  deleteObject( addSpaces(deleteName) );
 
-  console.log('deleting... (maybe)');
   $('input').val('');
+  $('select').val('NULL');
+
 }// end userDelete()
+
+var setSearchAs = function(){
+  var here = $( this ).attr( 'name' );
+  console.log('clicked search option', here );
+
+
+  $('.searchBy').addClass('notSelectedOption');
+  $( this ).removeClass('notSelectedOption');
+
+  switch ($( this ).attr( 'name' ) ) {
+    case 'name':
+      $('#sizeOption').hide();
+      $('#colorOption').hide();
+      $('#nameOption').show();
+
+      $('#searchItems').attr('data', 'name');
+      break;
+    case 'type':
+      $('#sizeOption').show();
+      $('#colorOption').show();
+      $('#nameOption').hide();
+
+      $('#searchItems').attr('data', 'type');
+      break;
+    default:
+  } // end switch
+
+}; // setSearchAs()
 
 var init = function(){
   ////when doc is ready////
+
+  $('#searchByName').hide();
+  $('#nameOption').hide();
+
+
   // hide search area
   $('.searchResults').hide();
   // get objects
@@ -161,8 +240,10 @@ var init = function(){
 }; // end init()
 
 var eventlisteners = function(){
-  $('#sellItem').on('click', userAdd);
+  $('#addItem').on('click', userAdd);
   $('#searchItems').on('click', userSearch);
   $('#deleteItems').on('click', userDelete);
+
+  $('.searchBy').on('click', setSearchAs);
 
 }; // end eventlisteners()

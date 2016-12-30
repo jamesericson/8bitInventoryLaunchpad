@@ -14,22 +14,20 @@
       <div id="search">
         <h2>Search Items</h2>
         <div id="searchOptions">
-          <h3>by name</h3>
+          <h3 class="searchBy" name="type" >by type</h3>
           <h3>|</h3>
-          <h3>by type</h3>
+          <h3 class="searchBy notSelectedOption" name="name" >by name</h3>
         </div>
 
         <p class="errorMessage" id="errorNameOption"></p>
-        <input type="text" id="nameOption" placeholder="item name" />
+        <select id="colorOption">  </select>
+        <p class="errorMessage" id="errorSizeOption"></p>
+        <select id="sizeOption">  </select>
 
-        <h3>-- or --</h3>
-          <p class="errorMessage" id="errorNameOption"></p>
-          <select id="colorOption">  </select>
-          <br>
-          <p class="errorMessage" id="errorSizeOption"></p>
-          <select id="sizeOption">  </select>
-          <br><br>
-          <button id="searchItems" >Search</button>
+        <p class="errorMessage" id="errorNameOption"></p>
+        <input type="text" id="nameOption" placeholder="item name" />
+        <p></p>
+        <button id="searchItems" data="type" >Search</button>
       </div>
 
       <div id="add">
@@ -45,13 +43,14 @@
         <p class="errorMessage" id="errorSizeIn"></p>
         <select id='sizeIn'>  </select>
         <br><br>
-        <button id="sellItem" >Submit</button>
+        <button id="addItem" >Submit</button>
       </div>
 
       <div id="delete">
         <h2>Delete Item</h2>
         <p class="errorMessage" id="errorDeleteName"></p>
         <!-- <input type="text" id='deleteName' placeholder="item name" /> -->
+        <select id='deleteName'>  </select>
         <br><br><button id="deleteItems" >Delete</button>
       </div>
   </div>

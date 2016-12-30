@@ -36,6 +36,24 @@ app.post( '/addItem', urlEncodedParser, function( req, res ){
 
 }); // end addItem route
 
+// delete object from the inventory
+app.post( '/deleteItem', urlEncodedParser, function( req, res ){
+  console.log( 'deleteItem route hit:', req.body );
+  // connect to db
+  pg.connect(connectionString, function( err, client, done ){
+    if (err){
+      console.log(err);
+    } else {
+      console.log('connected to DB');
+      client.query( 'DELETE FROM storeInventory WHERE name=$1', [req.body.name]);
+      done();
+      res.send('coolio');
+    } // end if else
+  });// end connect
+
+}); // end addItem route
+
+
 // get all objects in the inventory
 app.get( '/getInventory', function( req, res ){
   console.log( 'getInventory route hit' );
