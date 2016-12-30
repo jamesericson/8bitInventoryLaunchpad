@@ -6,6 +6,7 @@ var colors = [ 'red', 'orange', 'yellow', 'green', 'mermaid_treasure', 'blue', '
 
 ////// global array of items in inventory //////
 var items = [];
+var sortedBy = 'name';
 
 $( document ).ready( function(){
   init();
@@ -130,7 +131,7 @@ var getObjects = function(){
     success: function(response){
       console.log(response);
       items = response;
-      displayObjects(response);
+      sortObjects(response);
       updateDeleteOptions(response);
     },
     error: function (err) {
@@ -138,6 +139,12 @@ var getObjects = function(){
     }
   });//end ajax
 }; // end getObjects
+
+var sortObjects = function(itemArray){
+  console.log('in sortObjects');
+
+  displayObjects(itemArray);
+}// end sortObjects
 
 var displayObjects = function(itemArray){
   var outputText = '<ul>';
@@ -180,20 +187,25 @@ var userAdd = function(){
 
 var userSearch = function(){
   $('.errorMessage').text('');
+  var colorIn = $('#colorOption').val();
+  var sizeIn = $('#sizeOption').val();
+  var nameIn = $('#nameOption').val();
 
   if ($('#searchItems').attr('data') === 'name'){
     console.log('searching by name');
-    if ($('#nameOption').val() === ''){
+    if (nameIn === ''){
       $('#errorNameOption').text('ERROR: missing item name');
       return;
     }
-    findNamedObject( $('#nameOption').val() );
+    findNamedObject( nameIn );
   }else{
     console.log('searching by type');
-    findObject(
-      $('#colorOption').val(),
-      $('#sizeOption').val()
-    );
+    if ( colorIn === 'NULL' || sizeIn === 'NULL'){
+      if (colorIn == 'NULL')$('#errorColorOption').text('ERROR: missing item size');
+      if (sizeIn == 'NULL')$('#errorSizeOption').text('ERROR: missing item size');
+      return;
+    }// end if
+    findObject(colorIn, sizeIn);
   }//end if else
 
   $('input').val('');
@@ -242,6 +254,32 @@ var setSearchAs = function(){
 
 }; // setSearchAs()
 
+var sortAs = function(){
+  var here = $(this).attr( 'name' );
+  console.log('sorting items by:', here);
+
+  $('.errorMessage').text('');
+  $('.sortBy').addClass('notSelectedOption');
+  $( this ).removeClass('notSelectedOption');
+
+  sortedBy = $(this).attr( 'name' );
+  getObjects(items);
+  // switch ( $(this).attr( 'name' ) ) {
+  //   case 'name':
+  //
+  //   break;
+  //   case 'color':
+  //   console.log('to func color');
+  //
+  //     break;
+  //   case 'size':
+  //   console.log('to func size');
+  //
+  //     break;
+  //   default:
+// } // end switch
+}; // end sortAs()
+
 var init = function(){
   ////when doc is ready////
   // set search to 'by type'
@@ -262,5 +300,5 @@ var eventlisteners = function(){
   $('#deleteItems').on('click', userDelete);
 
   $('.searchBy').on('click', setSearchAs);
-
+  $('.sortBy').on('click', sortAs)
 }; // end eventlisteners()
