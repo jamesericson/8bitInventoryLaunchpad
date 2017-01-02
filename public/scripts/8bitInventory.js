@@ -6,7 +6,6 @@ var colors = [ 'red', 'orange', 'yellow', 'green', 'mermaid_treasure', 'blue', '
 
 ////// global array of items in inventory //////
 var items = [];
-var sortedBy = 'name';
 
 $( document ).ready( function(){
   init();
@@ -131,7 +130,7 @@ var getObjects = function(){
     success: function(response){
       console.log(response);
       items = response;
-      sortObjects(response);
+      displayObjects(response);
       updateDeleteOptions(response);
     },
     error: function (err) {
@@ -139,12 +138,6 @@ var getObjects = function(){
     }
   });//end ajax
 }; // end getObjects
-
-var sortObjects = function(itemArray){
-  console.log('in sortObjects');
-
-  displayObjects(itemArray);
-}// end sortObjects
 
 var displayObjects = function(itemArray){
   var outputText = '<ul>';
@@ -255,29 +248,25 @@ var setSearchAs = function(){
 }; // setSearchAs()
 
 var sortAs = function(){
-  var here = $(this).attr( 'name' );
-  console.log('sorting items by:', here);
+  console.log('this is this', this);
 
   $('.errorMessage').text('');
   $('.sortBy').addClass('notSelectedOption');
   $( this ).removeClass('notSelectedOption');
 
-  sortedBy = $(this).attr( 'name' );
-  getObjects(items);
-  // switch ( $(this).attr( 'name' ) ) {
-  //   case 'name':
-  //
-  //   break;
-  //   case 'color':
-  //   console.log('to func color');
-  //
-  //     break;
-  //   case 'size':
-  //   console.log('to func size');
-  //
-  //     break;
-  //   default:
-// } // end switch
+  $.ajax({
+    type: 'POST',
+    url: '/sortBy',
+    data: {sortBy:  $(this).attr( 'name' )},
+    success: function(resonse){
+      console.log('back from server:', resonse);
+
+      getObjects();
+    },
+    error: function(err){
+      console.log('error from server:', err);
+    }
+  });//end ajax
 }; // end sortAs()
 
 var init = function(){

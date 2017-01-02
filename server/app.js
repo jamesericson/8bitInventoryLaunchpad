@@ -7,6 +7,9 @@ var pg = require( 'pg' );
 var port = process.env.PORT || 3003;
 var connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/inventory'
 
+//global variable to control how data is gotten from DB
+var sortBy = 'name'
+
 // spin up server
 app.listen( port, function(){
   console.log( 'server up on:', port );
@@ -53,6 +56,18 @@ app.post( '/deleteItem', urlEncodedParser, function( req, res ){
 
 }); // end addItem route
 
+// change sorting variable which controls how data is displayed
+app.post( '/sortBy', urlEncodedParser, function( req, res ){
+  console.log( 'sortBy route hit:', req.body );
+  sortBy = req.body.sortBy;
+
+  if (sortBy === 'size')sortBy += ' DESC';
+  console.log('sortBy = ', sortBy);
+
+
+
+  res.send('coolio');
+}); // end addItem route
 
 // get all objects in the inventory
 app.get( '/getInventory', function( req, res ){
@@ -63,7 +78,7 @@ app.get( '/getInventory', function( req, res ){
       console.log(err);
     } else {
       console.log('connected to DB');
-      var query = client.query( 'SELECT * FROM storeInventory');
+      var query = client.query( 'SELECT * FROM storeInventory ORDER BY ' + sortBy + ';');
       //array for list
       var allInventory = [];
       query.on( 'row', function( row ){
