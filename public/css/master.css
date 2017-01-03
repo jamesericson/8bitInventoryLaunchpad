@@ -7,7 +7,7 @@ html, body {
 }
 
 html {
-  min-width: 650px;
+  min-width: 810px;
 }
 
 body {
@@ -47,6 +47,56 @@ h1 {
   border-bottom: 1px solid black;
 }
 
+.inventory {
+  background-color: #aaaaaa;
+  padding: 10px 0;
+}
+
+.searchResults {
+  padding: 10px 0;
+  background-color: #888888;
+  margin-bottom: 35px;
+}
+
+img {
+  max-width: 100px;
+  height: 90px;
+  border: 3px solid white;
+}
+
+.itemImg {
+  width: 100px;
+  padding-right: 25px;
+  border-right: 1px solid #dddddd;
+}
+
+.item {
+  display: flex;
+  text-align: left;
+  padding: 10px 20px;
+  border-bottom: 1px solid grey;
+}
+
+.item p {
+  margin-left: 10px;
+  line-height: 10px;
+  color: black;
+  font-size: 12px;
+  background-color: #aaaaaa;
+}
+
+.item .itemName {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  width: 250px;
+}
+
+.item .itemCreated {
+  position: relative;
+  top: 68px;
+}
+
 
 .options {
   display: inline-flex;
@@ -74,19 +124,7 @@ h1 {
   margin-bottom: 1px;
 }
 
-.inventory {
-  background-color: #aaaaaa;
-  padding: 10px 0;
-}
-
-.searchResults {
-  padding: 10px 0;
-  background-color: #888888;
-  margin-bottom: 35px;
-}
-
 ul {
-  margin-left: 10px;
   text-align: left;
 }
 

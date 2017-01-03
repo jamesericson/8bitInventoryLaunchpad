@@ -2,7 +2,7 @@
 // add _ in place of a space inorder to retain information in the DB
 // app uses function addSpaces to replace "_" with " " for DOM use
 var sizes = [ 'small', 'medium', 'large', 'extra_large'];
-var colors = [ 'red', 'orange', 'yellow', 'green', 'mermaid_treasure', 'blue', 'purple' ];
+var colors = [ 'black', 'red', 'orange', 'yellow', 'green', 'mermaid_treasure', 'blue', 'purple' ];
 
 ////// global array of items in inventory //////
 var items = [];
@@ -28,6 +28,27 @@ var addSpaces = function(word){
   } // end for
   return word;
 }; // end addSpaces()
+
+var formateDate = function(date){
+  var dateString = date.slice(5,10) + '-' + date.slice(2,4) + ' @ ';
+
+  var time = date.slice(11,13);
+  // change time to central time zone
+  var time = parseInt(time) - 6;
+  if (time < 0){
+    time += 24;
+  }
+  // make time in AM/PM formate
+  if (time<12){
+    dateString += time + date.slice(13,16) + 'am';
+  } else if ( time == 12 ){
+    dateString += '12' + date.slice(13,16) + 'pm';
+  } else {
+    dateString += (time-12) + date.slice(13,16) + 'pm';
+  } // end if else 
+
+  return dateString
+}//end formateDate()
 
 var setUpOptions = function(){
   var outputText = '<option value=NULL>--Select a Color--</option>';
@@ -141,11 +162,15 @@ var getObjects = function(){
 }; // end getObjects
 
 var displayObjects = function(itemArray){
-  var outputText = '<ul>';
+  var outputText = '';
   for (var i = 0; i < itemArray.length; i++) {
-    outputText += '<li>a ' + addSpaces(itemArray[i].size) + ' ' + addSpaces(itemArray[i].color) + ' ' + itemArray[i].name + '</li>';
+    outputText += '<div class="item"><div class="itemImg"><img src="'+ itemArray[i].img_url +'" alt="'+ itemArray[i].name +' image"></div>' +
+                  '<div><p class="itemName">' + itemArray[i].name + '</p>' +
+                  '<p>Size: ' + addSpaces(itemArray[i].size) + '</p> '+
+                  '<p>Color: ' + addSpaces(itemArray[i].color) + '</p></div>'+
+                  '<div><p class="itemCreated" >Created: '+ formateDate(itemArray[i].created) +'</p></div></div>';
   }
-  outputText += '</ul>';
+  // outputText += '';
   $('#outputText').html(outputText);
 };//end displayItems()
 
