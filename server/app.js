@@ -31,7 +31,7 @@ app.post( '/addItem', urlEncodedParser, function( req, res ){
       console.log(err);
     } else {
       console.log('connected to DB');
-      client.query( 'INSERT INTO storeInventory (name, color, size) VALUES ($1, $2, $3)', [req.body.name, req.body.color, req.body.size]);
+      client.query( 'INSERT INTO storeInventory (name, color, size, img_url) VALUES ($1, $2, $3, $4)', [req.body.name, req.body.color, req.body.size, req.body.imgURL]);
       done();
       res.send('coolio');
     } // end if else

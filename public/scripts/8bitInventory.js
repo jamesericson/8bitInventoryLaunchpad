@@ -44,7 +44,7 @@ var setUpOptions = function(){
 
 };//end setUpOptions();
 
-var addObject = function( colorIn, nameIn, sizeIn ){
+var addObject = function( colorIn, nameIn, sizeIn, imgIn ){
   console.log( 'in addObject: adding ', nameIn);
 
   $.ajax({
@@ -53,7 +53,8 @@ var addObject = function( colorIn, nameIn, sizeIn ){
     data: {
       color: colorIn,
       name: nameIn,
-      size: sizeIn
+      size: sizeIn,
+      imgURL : imgIn
     },
     success: function(response){
       console.log('back from server with: ', response);
@@ -162,16 +163,18 @@ var userAdd = function(){
   var colorIn = $('#colorIn').val();
   var nameIn = $('#nameIn').val();
   var sizeIn = $('#sizeIn').val();
+  var imgIn = $('#imgIn').val();
 
-  if ( colorIn == 'NULL' || nameIn == '' || sizeIn == 'NULL'){
+  if ( colorIn == 'NULL' || nameIn == '' || sizeIn == 'NULL' || imgIn == ''){
     if (colorIn == 'NULL')$('#errorColorIn').text('ERROR: missing item color');
     if (nameIn == '')$('#errorNameIn').text('ERROR: missing item name');
     if (sizeIn == 'NULL')$('#errorSizeIn').text('ERROR: missing item size');
+    if (imgIn == '')$('#errorImgIn').text('ERROR: missing image url')
     return;
   }
   $('.searchResults').hide()
 
-  addObject( colorIn, nameIn, sizeIn );
+  addObject( colorIn, nameIn, sizeIn, imgIn );
 
   $('input').val('');
   $('select').val('NULL');
