@@ -304,6 +304,45 @@ var sortAs = function(){
   });//end ajax
 }; // end sortAs()
 
+var picOptions = function() {
+  console.log('in picOptions');
+  $('.errorMessage').text('');
+  var nameIn = $('#nameIn').val();
+  if (nameIn == ''){
+    $('#errorNameIn').text('ERROR: missing item name');
+    return;
+  }
+  // bellow is a borrowed code that access an flickr api to find most recent posts under a certain tag
+  $.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?",
+{
+  tags: nameIn,
+  tagmode: "any",
+  format: "json"
+},
+function(data) {
+  var outputText = '';
+  $.each(data.items, function(i,item){
+    outputText += '<img src="' + item.media.m + ' alt="' + nameIn + ' image option">';
+    if ( i == 6 ) return false;
+  }); // end each
+  $('#picOptions').html(outputText);
+  $('#picOptions').slideDown();
+});// end ajax
+
+
+  //
+  // var outputText = '';
+  //
+  // for (var i = 0; i < 6; i++) {
+  //   outputText += '<img src="http://3dprintingindustry.com/wp-content/uploads/2014/12/vault-boy-3d-printing.jpg" alt="good job">';
+  // }
+  //
+  // $('#picOptions').html(outputText);
+  // $('#picOptions').slideDown();
+}; // end picOptions
+
+
+//=============================================================//
 var init = function(){
   ////when doc is ready////
   // set search to 'by type'
@@ -325,4 +364,5 @@ var eventlisteners = function(){
 
   $('.searchBy').on('click', setSearchAs);
   $('.sortBy').on('click', sortAs)
+  $(document).on('click', '#getImages', picOptions)
 }; // end eventlisteners()

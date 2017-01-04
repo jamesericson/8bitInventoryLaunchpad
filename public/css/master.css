@@ -137,11 +137,18 @@ h2 {
 }
 
 #getImages {
-  display: none;
   font-size: 12px;
   text-decoration: underline;
 }
 
 #getImages:hover {
   color: white;
+}
+
+#picOptions {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
 }
