@@ -97,6 +97,9 @@ img {
   top: 68px;
 }
 
+.item:last-child {
+  border: none;
+}
 
 .options {
   display: inline-flex;
@@ -134,6 +137,7 @@ h2 {
 }
 
 #getImages {
+  display: none;
   font-size: 12px;
   text-decoration: underline;
 }
