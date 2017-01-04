@@ -64,8 +64,6 @@ app.post( '/sortBy', urlEncodedParser, function( req, res ){
   if (sortBy === 'size')sortBy += ' DESC';
   console.log('sortBy = ', sortBy);
 
-
-
   res.send('coolio');
 }); // end addItem route
 
@@ -92,6 +90,56 @@ app.get( '/getInventory', function( req, res ){
       });
     }//end if else
   })// end connect
+}); // end addItem route
+
+//find object by name and size
+app.post( '/findObject', urlEncodedParser, function( req, res ){
+  console.log( 'findObject route hit:', req.body );
+  // connect to db
+  pg.connect(connectionString, function( err, client, done ){
+    if (err){
+      console.log(err);
+    } else {
+      console.log('connected to DB');
+      var query = client.query( 'SELECT * FROM storeInventory where size=$1 AND color=$2', [req.body.size, req.body.color]);
+      //array for list
+      var matches = [];
+      query.on( 'row', function( row ){
+        matches.push (row);
+      });
+      query.on( 'end', function(){
+      done();
+      console.log( matches);
+
+      res.send( matches);
+      });
+    } // end if else
+  });// end connect
+}); // end addItem route
+
+//find object by name and size
+app.post( '/findNamedObject', urlEncodedParser, function( req, res ){
+  console.log( 'findNamedObject route hit:', req.body );
+  // connect to db
+  pg.connect(connectionString, function( err, client, done ){
+    if (err){
+      console.log(err);
+    } else {
+      console.log('connected to DB');
+      var query = client.query( 'SELECT * FROM storeInventory WHERE name LIKE \'%' + req.body.name + '%\';');
+      //array for list
+      var matches = [];
+      query.on( 'row', function( row ){
+        matches.push (row);
+      });
+      query.on( 'end', function(){
+      done();
+      console.log( matches);
+
+      res.send( matches);
+      });
+    } // end if else
+  });// end connect
 }); // end addItem route
 
 // static folder

@@ -4,9 +4,6 @@
 var sizes = [ 'small', 'medium', 'large', 'extra_large'];
 var colors = [ 'black', 'red', 'orange', 'yellow', 'green', 'mermaid_treasure', 'blue', 'purple' ];
 
-////// global array of items in inventory //////
-var items = [];
-
 $( document ).ready( function(){
   init();
 }); // end doc ready
@@ -45,7 +42,7 @@ var formateDate = function(date){
     dateString += '12' + date.slice(13,16) + 'pm';
   } else {
     dateString += (time-12) + date.slice(13,16) + 'pm';
-  } // end if else 
+  } // end if else
 
   return dateString
 }//end formateDate()
@@ -89,26 +86,36 @@ var addObject = function( colorIn, nameIn, sizeIn, imgIn ){
 
 var findObject = function( colorCheck, sizeCheck ){
   console.log( 'in findObject. Looking for:', colorCheck, sizeCheck );
-  // array of matches
-  var matches = [];
-  for ( var i = 0; i < items.length; i++ ) {
-    if( items[i].color == colorCheck && items[i].size == sizeCheck ){
-      // match, add to array
-      matches.push( items[i] );
-    } // end if
-  } // end for
-  displayFoundObjects(matches);
+
+  $.ajax({
+    type: 'POST',
+    url: '/findObject',
+    data: {color: colorCheck, size: sizeCheck},
+    success: function(response){
+      console.log('back from server, data: ', response);
+      displayFoundObjects(response);
+    },
+    error: function(err){
+      console.log('back from server with error: ', err);
+    }
+  });// end ajax
 }; // end findObject
 
 var findNamedObject = function( nameCheck ){
-  var matches = [];
-  for ( var i = 0; i < items.length; i++ ) {
-    if( items[i].name == nameCheck ){
-      // match, add to array
-      matches.push( items[i] );
-    } // end if
-  } // end for
-  displayFoundObjects(matches);
+  console.log( 'in findNamedObject. Looking for:', nameCheck );
+
+  $.ajax({
+    type: 'POST',
+    url: '/findNamedObject',
+    data: {name: nameCheck},
+    success: function(response){
+      console.log('back from server, data: ', response);
+      displayFoundObjects(response);
+    },
+    error: function(err){
+      console.log('back from server with error: ', err);
+    }
+  });// end ajax
 }; // end findNamedObject()
 
 var deleteObject = function( objectName ){
@@ -133,11 +140,13 @@ var displayFoundObjects = function(itemArray){
     if(itemArray.length == 0){
       outputText += '<p>no matching items found</p>';
     }
-    outputText += '<ul>';
     for (var i = 0; i < itemArray.length; i++) {
-      outputText += '<li>a ' + itemArray[i].name + '</li>';
+      outputText += '<div class="item"><div class="itemImg"><img src="'+ itemArray[i].img_url +'" alt="'+ itemArray[i].name +' image"></div>' +
+                    '<div><p class="itemName">' + itemArray[i].name + '</p>' +
+                    '<p>Size: ' + addSpaces(itemArray[i].size) + '</p> '+
+                    '<p>Color: ' + addSpaces(itemArray[i].color) + '</p></div>'+
+                    '<div><p class="itemCreated" >Created: '+ formateDate(itemArray[i].created) +'</p></div></div>';
     } // end for
-    outputText += '</ul>';
     $('.searchResults').html(outputText);
   }); // end slideTaggle
   $('.searchResults').slideDown();
@@ -151,7 +160,6 @@ var getObjects = function(){
     url: '/getInventory',
     success: function(response){
       console.log(response);
-      items = response;
       displayObjects(response);
       updateDeleteOptions(response);
     },
@@ -169,8 +177,7 @@ var displayObjects = function(itemArray){
                   '<p>Size: ' + addSpaces(itemArray[i].size) + '</p> '+
                   '<p>Color: ' + addSpaces(itemArray[i].color) + '</p></div>'+
                   '<div><p class="itemCreated" >Created: '+ formateDate(itemArray[i].created) +'</p></div></div>';
-  }
-  // outputText += '';
+  } // end for
   $('#outputText').html(outputText);
 };//end displayItems()
 
