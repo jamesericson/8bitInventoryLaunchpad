@@ -149,6 +149,15 @@ h2 {
   display: none;
   position: fixed;
   bottom: 0;
-  left: 10%;
-  right: 10%;
+  left: 5%;
+  right: 5%;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+#picOptions img {
+  margin: 1rem;
+}
+
+.selectImg:hover {
+  border: 3px solid blue;
 }

@@ -3,6 +3,7 @@
 // app uses function addSpaces to replace "_" with " " for DOM use
 var sizes = [ 'small', 'medium', 'large', 'extra_large'];
 var colors = [ 'black', 'red', 'orange', 'yellow', 'green', 'mermaid_treasure', 'blue', 'purple' ];
+var nuPicOpt = 9;
 
 $( document ).ready( function(){
   init();
@@ -312,7 +313,7 @@ var picOptions = function() {
     $('#errorNameIn').text('ERROR: missing item name');
     return;
   }
-  // bellow is a borrowed code that access an flickr api to find most recent posts under a certain tag
+  // bellow accesses a flickr api to find most recent posts under a certain tag
   $.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?",
 {
   tags: nameIn,
@@ -320,13 +321,23 @@ var picOptions = function() {
   format: "json"
 },
 function(data) {
+  console.log('data', data);
   var outputText = '';
-  $.each(data.items, function(i,item){
-    outputText += '<img src="' + item.media.m + ' alt="' + nameIn + ' image option">';
-    if ( i == 6 ) return false;
-  }); // end each
+  for( var i=0 ; i < nuPicOpt ; i++){
+    outputText += '<img class="selectImg" index=' + i + ' src="' + data.items[i].media.m + ' alt="' + nameIn + ' image option">';
+  }; // end for
+  outputText += '<img class="selectImg" index=99 src="img/moreImg.png" alt="load more images?">';
   $('#picOptions').html(outputText);
   $('#picOptions').slideDown();
+
+  $(document).one('click', '.selectImg' ,function(){
+      var outputText = '';
+      for( var i=nuPicOpt ; i < (nuPicOpt*2+1) ; i++){
+        outputText += '<img class="selectImg" index=' + i + ' src="' + data.items[i].media.m + ' alt="' + nameIn + ' image option">';
+      }; // end for
+      $('#picOptions').html(outputText);
+  }); //end one click
+
 });// end ajax
 
 
