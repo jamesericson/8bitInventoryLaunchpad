@@ -27,9 +27,11 @@ h1 {
   float: left;
   box-sizing: border-box;
   width: 30%;
+  min-width: 244px;
   background-color: #dddddd;
   border: white solid 20px;
   padding-bottom: 30px;
+  position: fixed;
 }
 
 #right-section {

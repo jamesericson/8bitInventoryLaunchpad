@@ -3,7 +3,9 @@
 // app uses function addSpaces to replace "_" with " " for DOM use
 var sizes = [ 'small', 'medium', 'large', 'extra_large'];
 var colors = [ 'black', 'red', 'orange', 'yellow', 'green', 'mermaid_treasure', 'blue', 'purple' ];
-var nuPicOpt = 10;
+
+var nuPicOpt = 10; // number of img from flickr api displayed at a time **IMPORTANT-> can't go more than 10
+
 
 $( document ).ready( function(){
   init();
@@ -322,7 +324,7 @@ var picOptions = function() {
   },
   function(data) {
     console.log('data', data);
-    var outputText = '<p>Click on an image or click on more</p>';
+    var outputText = '<p>Click on an image or click to load more</p>';
     for( var i=0 ; i < nuPicOpt ; i++){
       outputText += '<img class="selectImg" index=' + i + ' src="' + data.items[i].media.m + '" alt="' + nameIn + ' image option">';
     }; // end for
@@ -379,4 +381,8 @@ var eventlisteners = function(){
   $('.searchBy').on('click', setSearchAs);
   $('.sortBy').on('click', sortAs)
   $(document).on('click', '#getImages', picOptions)
+
+  $(window).scroll(function(){
+    $("#left-section").css("top", Math.max(-40, 92 - $(this).scrollTop()));
+});
 }; // end eventlisteners()
