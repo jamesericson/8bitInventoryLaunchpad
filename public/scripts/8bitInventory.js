@@ -3,7 +3,7 @@
 // app uses function addSpaces to replace "_" with " " for DOM use
 var sizes = [ 'small', 'medium', 'large', 'extra_large'];
 var colors = [ 'black', 'red', 'orange', 'yellow', 'green', 'mermaid_treasure', 'blue', 'purple' ];
-var nuPicOpt = 9;
+var nuPicOpt = 10;
 
 $( document ).ready( function(){
   init();
@@ -312,44 +312,47 @@ var picOptions = function() {
   if (nameIn == ''){
     $('#errorNameIn').text('ERROR: missing item name');
     return;
-  }
+  }// end if
   // bellow accesses a flickr api to find most recent posts under a certain tag
   $.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?",
-{
-  tags: nameIn,
-  tagmode: "any",
-  format: "json"
-},
-function(data) {
-  console.log('data', data);
-  var outputText = '';
-  for( var i=0 ; i < nuPicOpt ; i++){
-    outputText += '<img class="selectImg" index=' + i + ' src="' + data.items[i].media.m + ' alt="' + nameIn + ' image option">';
-  }; // end for
-  outputText += '<img class="selectImg" index=99 src="img/moreImg.png" alt="load more images?">';
-  $('#picOptions').html(outputText);
-  $('#picOptions').slideDown();
+  {
+    tags: nameIn,
+    tagmode: "any",
+    format: "json"
+  },
+  function(data) {
+    console.log('data', data);
+    var outputText = '<p>Click on an image or click on more</p>';
+    for( var i=0 ; i < nuPicOpt ; i++){
+      outputText += '<img class="selectImg" index=' + i + ' src="' + data.items[i].media.m + '" alt="' + nameIn + ' image option">';
+    }; // end for
+    outputText += '<img class="selectImg" index=99 src="img/moreImg.png" alt="load more images?">';
+    $('#picOptions').html(outputText);
+    $('#picOptions').slideDown();
 
-  $(document).one('click', '.selectImg' ,function(){
-      var outputText = '';
-      for( var i=nuPicOpt ; i < (nuPicOpt*2+1) ; i++){
-        outputText += '<img class="selectImg" index=' + i + ' src="' + data.items[i].media.m + ' alt="' + nameIn + ' image option">';
-      }; // end for
-      $('#picOptions').html(outputText);
-  }); //end one click
+    $(document).one('click', '.selectImg' ,function(){
+      if ( $(this).attr('index') == 99 ){
+          var outputText = '<p>Click on an image or click on cancel</p>';
+          for( var i=nuPicOpt ; i < (nuPicOpt*2) ; i++){
+            outputText += '<img class="selectImg" index=' + i + ' src="' + data.items[i].media.m + '" alt="' + nameIn + ' image option">';
+          }; // end for
+          outputText += '<img class="selectImg" index=99 src="img/cancelImg.png" alt="load more images?">';
+          $('#picOptions').html(outputText);
+          $(document).one('click', '.selectImg' ,function(){
+            if ( $(this).attr('index') == 99 ){
+              $('#picOptions').slideUp( );
+            } else {
+              $('#picOptions').slideUp( );
+              $('#imgIn').val( $(this).attr('src') );
+            } // end if else
+          });// end nested one click
+        } else {
+          $('#picOptions').slideUp( );
+          $('#imgIn').val( $(this).attr('src') );
+        }
+      }); //end one click
 
-});// end ajax
-
-
-  //
-  // var outputText = '';
-  //
-  // for (var i = 0; i < 6; i++) {
-  //   outputText += '<img src="http://3dprintingindustry.com/wp-content/uploads/2014/12/vault-boy-3d-printing.jpg" alt="good job">';
-  // }
-  //
-  // $('#picOptions').html(outputText);
-  // $('#picOptions').slideDown();
+  });// end ajax
 }; // end picOptions
 
 
