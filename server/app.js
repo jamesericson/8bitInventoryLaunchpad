@@ -40,15 +40,15 @@ app.post( '/addItem', urlEncodedParser, function( req, res ){
 }); // end addItem route
 
 // delete object from the inventory
-app.post( '/deleteItem', urlEncodedParser, function( req, res ){
-  console.log( 'deleteItem route hit:', req.body );
+app.delete( '/deleteItem/:name', urlEncodedParser, function( req, res ){
+  console.log( 'deleteItem route hit:', req.params.name );
   // connect to db
   pg.connect(connectionString, function( err, client, done ){
     if (err){
       console.log(err);
     } else {
       console.log('connected to DB');
-      client.query( 'DELETE FROM storeInventory WHERE name=$1', [req.body.name]);
+      client.query( 'DELETE FROM storeInventory WHERE name=$1', [req.params.name]);
       done();
       res.send('coolio');
     } // end if else
@@ -84,7 +84,6 @@ app.get( '/getInventory', function( req, res ){
       });
       query.on( 'end', function(){
       done();
-      console.log( allInventory);
 
       res.send( allInventory);
       });

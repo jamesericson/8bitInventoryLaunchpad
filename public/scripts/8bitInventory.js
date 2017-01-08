@@ -124,9 +124,8 @@ var findNamedObject = function( nameCheck ){
 var deleteObject = function( objectName ){
   console.log('in deleteObject: deleting = ', {name: objectName});
   $.ajax({
-    type: 'POST',
-    url: '/deleteItem',
-    data: {name: objectName},
+    type: 'DELETE',
+    url: '/deleteItem/' + objectName,
     success: function(response){
       console.log(response);
       getObjects();
