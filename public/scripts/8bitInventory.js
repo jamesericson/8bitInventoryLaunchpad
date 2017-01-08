@@ -11,6 +11,7 @@ $( document ).ready( function(){
   init();
 }); // end doc ready
 
+// Utile functions =========================================
 var addUnderscore = function(word){
   for (var i = 0; i < word.length; i++) {
     if (word[i] == ' ') {
@@ -50,20 +51,23 @@ var formateDate = function(date){
   return dateString
 }//end formateDate()
 
-var setUpOptions = function(){
-  var outputText = '<option value=NULL>--Select a Color--</option>';
-  for (var i = 0; i < colors.length; i++) {
-    outputText += '<option value=' + colors[i] + '>' + addSpaces(colors[i]) + '</option>';
-  } // end for
-  $('#colorIn, #colorOption').html(outputText);
+// Logic/Ajax functions===========================================
+var search = function(object){
+  console.log('in search, with object: ', object);
 
-  outputText = '<option value=NULL>--Select a Size--</option>';
-  for (var i = 0; i < sizes.length; i++) {
-    outputText += '<option value=' + sizes[i] + '>' + addSpaces(sizes[i]) + '</option>';
-  } // end for
-  $('#sizeIn, #sizeOption' ).html(outputText);
-
-};//end setUpOptions();
+  $.ajax({
+    type: 'POST',
+    url: '/search',
+    data: object,
+    success: function(response){
+      console.log('back from server, data: ', response);
+      displaySearchResults(response.matches, response.searchedBy);
+    },
+    error: function(err){
+      console.log('back from server with error: ', err);
+    }
+  });// end ajax
+};// end search()
 
 var addObject = function( colorIn, nameIn, sizeIn, imgIn ){
   console.log( 'in addObject: adding ', nameIn);
@@ -87,40 +91,6 @@ var addObject = function( colorIn, nameIn, sizeIn, imgIn ){
   });// end ajax
 }; // end addObject
 
-var findObject = function( colorCheck, sizeCheck ){
-  console.log( 'in findObject. Looking for:', colorCheck, sizeCheck );
-
-  $.ajax({
-    type: 'POST',
-    url: '/findObject',
-    data: {color: colorCheck, size: sizeCheck},
-    success: function(response){
-      console.log('back from server, data: ', response);
-      displayFoundObjects(response);
-    },
-    error: function(err){
-      console.log('back from server with error: ', err);
-    }
-  });// end ajax
-}; // end findObject
-
-var findNamedObject = function( nameCheck ){
-  console.log( 'in findNamedObject. Looking for:', nameCheck );
-
-  $.ajax({
-    type: 'POST',
-    url: '/findNamedObject',
-    data: {name: nameCheck},
-    success: function(response){
-      console.log('back from server, data: ', response);
-      displayFoundObjects(response);
-    },
-    error: function(err){
-      console.log('back from server with error: ', err);
-    }
-  });// end ajax
-}; // end findNamedObject()
-
 var deleteObject = function( objectName ){
   console.log('in deleteObject: deleting = ', {name: objectName});
   $.ajax({
@@ -135,24 +105,6 @@ var deleteObject = function( objectName ){
     }
   });//end ajax
 }// end deleteObject()
-
-var displayFoundObjects = function(itemArray){
-  $('.searchResults').slideUp( function(){
-    var outputText = '<h2>Search Results</h2>';
-    if(itemArray.length == 0){
-      outputText += '<p>no matching items found</p>';
-    }
-    for (var i = 0; i < itemArray.length; i++) {
-      outputText += '<div class="item"><div class="itemImg"><img src="'+ itemArray[i].img_url +'" alt="'+ itemArray[i].name +' image"></div>' +
-                    '<div><p class="itemName">' + itemArray[i].name + '</p>' +
-                    '<p>Size: ' + addSpaces(itemArray[i].size) + '</p> '+
-                    '<p>Color: ' + addSpaces(itemArray[i].color) + '</p></div>'+
-                    '<div><p class="itemCreated" >Created: '+ formateDate(itemArray[i].created) +'</p></div></div>';
-    } // end for
-    $('.searchResults').html(outputText);
-  }); // end slideTaggle
-  $('.searchResults').slideDown();
-}; // displayFoundObjects()
 
 var getObjects = function(){
   console.log( 'in getObjects');
@@ -171,26 +123,55 @@ var getObjects = function(){
   });//end ajax
 }; // end getObjects
 
-var displayObjects = function(itemArray){
-  var outputText = '';
-  for (var i = 0; i < itemArray.length; i++) {
-    outputText += '<div class="item"><div class="itemImg"><img src="'+ itemArray[i].img_url +'" alt="'+ itemArray[i].name +' image"></div>' +
-                  '<div><p class="itemName">' + itemArray[i].name + '</p>' +
-                  '<p>Size: ' + addSpaces(itemArray[i].size) + '</p> '+
-                  '<p>Color: ' + addSpaces(itemArray[i].color) + '</p></div>'+
-                  '<div><p class="itemCreated" >Created: '+ formateDate(itemArray[i].created) +'</p></div></div>';
-  } // end for
-  $('#outputText').html(outputText);
-};//end displayItems()
+var sortAs = function(){
+  console.log('this is this', this);
 
-var updateDeleteOptions = function(itemArray){
-  var outputText = '<option value=NULL>--Select a Name--</option>';
-  for (var i = 0; i < itemArray.length; i++) {
-    outputText += '<option value=' + addUnderscore(itemArray[i].name) + '>' + itemArray[i].name + '</option>';
-  }
-  $('#deleteName').html(outputText);
+  $('.errorMessage').text('');
+  $('.sortBy').addClass('notSelectedOption');
+  $( this ).removeClass('notSelectedOption');
 
-}// end updateDeleteOptions()
+  $.ajax({
+    type: 'POST',
+    url: '/sortBy',
+    data: {sortBy:  $(this).attr( 'name' )},
+    success: function(resonse){
+      console.log('back from server:', resonse);
+
+      getObjects();
+    },
+    error: function(err){
+      console.log('error from server:', err);
+    }
+  });//end ajax
+}; // end sortAs()
+
+// User Interaction functions==================================
+var userSearch = function(){
+  $('.errorMessage').text('');
+  var colorIn = $('#colorOption').val();
+  var sizeIn = $('#sizeOption').val();
+  var nameIn = $('#nameOption').val();
+
+  if ($('#searchItems').attr('data') === 'name' && nameIn === ''){
+      $('#errorNameOption').text('ERROR: missing item name');
+      return;
+    }// end if
+  if ($('#searchItems').attr('data') === 'type' && ( colorIn === 'NULL' && sizeIn === 'NULL') ){
+      if (colorIn == 'NULL')$('#errorColorOption').text('ERROR: missing item size');
+      if (sizeIn == 'NULL')$('#errorSizeOption').text('ERROR: missing item size');
+      return;
+    }// end if
+
+  search( {
+    color: colorIn,
+    size: sizeIn,
+    name: nameIn
+  } );
+
+  $('input').val('');
+  $('select').val('NULL');
+
+};// end userSearch()
 
 var userAdd = function(){
   $('.errorMessage').text('');
@@ -215,33 +196,27 @@ var userAdd = function(){
 
 };// end userAdd()
 
-var userSearch = function(){
+var picOptions = function() {
+  console.log('in picOptions');
   $('.errorMessage').text('');
-  var colorIn = $('#colorOption').val();
-  var sizeIn = $('#sizeOption').val();
-  var nameIn = $('#nameOption').val();
+  var nameIn = $('#nameIn').val();
+  if (nameIn == ''){
+    $('#errorNameIn').text('ERROR: missing item name');
+    return;
+  }// end if
+  // bellow accesses a flickr api to find most recent posts under a certain tag
+  $.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?",
+  {
+    tags: nameIn,
+    tagmode: "any",
+    format: "json"
+  },
+  function(data) {
+    console.log('Data from Flickr API: ', data.items);
 
-  if ($('#searchItems').attr('data') === 'name'){
-    console.log('searching by name');
-    if (nameIn === ''){
-      $('#errorNameOption').text('ERROR: missing item name');
-      return;
-    }
-    findNamedObject( nameIn );
-  }else{
-    console.log('searching by type');
-    if ( colorIn === 'NULL' || sizeIn === 'NULL'){
-      if (colorIn == 'NULL')$('#errorColorOption').text('ERROR: missing item size');
-      if (sizeIn == 'NULL')$('#errorSizeOption').text('ERROR: missing item size');
-      return;
-    }// end if
-    findObject(colorIn, sizeIn);
-  }//end if else
-
-  $('input').val('');
-  $('select').val('NULL');
-
-};// end userSearch()
+    displayPicOptions(data.items)
+  });// end ajax
+}; // end picOptions
 
 var userDelete = function() {
   $('.errorMessage').text('');
@@ -284,80 +259,100 @@ var setSearchAs = function(){
 
 }; // setSearchAs()
 
-var sortAs = function(){
-  console.log('this is this', this);
+// Display to DOM functions=============================
+var displayObjects = function(itemArray){
+  var outputText = '';
+  for (var i = 0; i < itemArray.length; i++) {
+    outputText += '<div class="item"><div class="itemImg"><img src="'+ itemArray[i].img_url +'" alt="'+ itemArray[i].name +' image"></div>' +
+                  '<div><p class="itemName">' + itemArray[i].name + '</p>' +
+                  '<p>Size: ' + addSpaces(itemArray[i].size) + '</p> '+
+                  '<p>Color: ' + addSpaces(itemArray[i].color) + '</p></div>'+
+                  '<div><p class="itemCreated" >Created: '+ formateDate(itemArray[i].created) +'</p></div></div>';
+  } // end for
+  $('#outputText').html(outputText);
+};//end displayItems()
 
-  $('.errorMessage').text('');
-  $('.sortBy').addClass('notSelectedOption');
-  $( this ).removeClass('notSelectedOption');
+var displayPicOptions = function(picArray){
+  console.log('in displayPicOptions');
 
-  $.ajax({
-    type: 'POST',
-    url: '/sortBy',
-    data: {sortBy:  $(this).attr( 'name' )},
-    success: function(resonse){
-      console.log('back from server:', resonse);
+  var outputText = '<p>Click on an image or click to load more</p>';
+  for( var i=0 ; i < nuPicOpt ; i++){
+    outputText += '<img class="selectImg" index=' + i + ' src="' + picArray[i].media.m + '" alt="' + nameIn + ' image option">';
+  }; // end for
+  outputText += '<img class="selectImg" index=99 src="img/moreImg.png" alt="load more images?">';
+  $('#picOptions').html(outputText);
+  $('#picOptions').slideDown();
 
-      getObjects();
-    },
-    error: function(err){
-      console.log('error from server:', err);
+  $(document).one('click', '.selectImg' ,function(){
+    if ( $(this).attr('index') == 99 ){
+        var outputText = '<p>Click on an image or click on cancel</p>';
+        for( var i=nuPicOpt ; i < (nuPicOpt*2) ; i++){
+          outputText += '<img class="selectImg" index=' + i + ' src="' + picArray[i].media.m + '" alt="' + nameIn + ' image option">';
+        }; // end for
+        outputText += '<img class="selectImg" index=99 src="img/cancelImg.png" alt="load more images?">';
+        $('#picOptions').html(outputText);
+        $(document).one('click', '.selectImg' ,function(){
+          if ( $(this).attr('index') == 99 ){
+            $('#picOptions').slideUp( );
+          } else {
+            $('#picOptions').slideUp( );
+            $('#imgIn').val( $(this).attr('src') );
+          } // end if else
+        });// end nested one click
+      } else {
+        $('#picOptions').slideUp();
+        $('#imgIn').val( $(this).attr('src') );
+      }
+    }); //end one click
+
+} // end displayPicOptions
+
+var displaySearchResults = function(itemArray, searchedBy){
+  $('.searchResults').slideUp( function(){
+    var outputText = '<h2>Search Results</h2>'+
+                     '<h3>Searched by ' + searchedBy;
+
+    if(itemArray.length == 0){
+      outputText += '<p>no matching items found</p>';
     }
-  });//end ajax
-}; // end sortAs()
+    for (var i = 0; i < itemArray.length; i++) {
+      outputText += '<div class="item"><div class="itemImg"><img src="'+ itemArray[i].img_url +'" alt="'+ itemArray[i].name +' image"></div>' +
+                    '<div><p class="itemName">' + itemArray[i].name + '</p>' +
+                    '<p>Size: ' + addSpaces(itemArray[i].size) + '</p> '+
+                    '<p>Color: ' + addSpaces(itemArray[i].color) + '</p></div>'+
+                    '<div><p class="itemCreated" >Created: '+ formateDate(itemArray[i].created) +'</p></div></div>';
+    } // end for
+    $('.searchResults').html(outputText);
+  }); // end slideTaggle
+  $('.searchResults').slideDown();
+}; // displaySearchResults()
 
-var picOptions = function() {
-  console.log('in picOptions');
-  $('.errorMessage').text('');
-  var nameIn = $('#nameIn').val();
-  if (nameIn == ''){
-    $('#errorNameIn').text('ERROR: missing item name');
-    return;
-  }// end if
-  // bellow accesses a flickr api to find most recent posts under a certain tag
-  $.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?",
-  {
-    tags: nameIn,
-    tagmode: "any",
-    format: "json"
-  },
-  function(data) {
-    console.log('data', data);
-    var outputText = '<p>Click on an image or click to load more</p>';
-    for( var i=0 ; i < nuPicOpt ; i++){
-      outputText += '<img class="selectImg" index=' + i + ' src="' + data.items[i].media.m + '" alt="' + nameIn + ' image option">';
-    }; // end for
-    outputText += '<img class="selectImg" index=99 src="img/moreImg.png" alt="load more images?">';
-    $('#picOptions').html(outputText);
-    $('#picOptions').slideDown();
+var updateDeleteOptions = function(itemArray){
+  var outputText = '<option value=NULL>--Select a Name--</option>';
+  for (var i = 0; i < itemArray.length; i++) {
+    outputText += '<option value=' + addUnderscore(itemArray[i].name) + '>' + itemArray[i].name + '</option>';
+  }
+  $('#deleteName').html(outputText);
 
-    $(document).one('click', '.selectImg' ,function(){
-      if ( $(this).attr('index') == 99 ){
-          var outputText = '<p>Click on an image or click on cancel</p>';
-          for( var i=nuPicOpt ; i < (nuPicOpt*2) ; i++){
-            outputText += '<img class="selectImg" index=' + i + ' src="' + data.items[i].media.m + '" alt="' + nameIn + ' image option">';
-          }; // end for
-          outputText += '<img class="selectImg" index=99 src="img/cancelImg.png" alt="load more images?">';
-          $('#picOptions').html(outputText);
-          $(document).one('click', '.selectImg' ,function(){
-            if ( $(this).attr('index') == 99 ){
-              $('#picOptions').slideUp( );
-            } else {
-              $('#picOptions').slideUp( );
-              $('#imgIn').val( $(this).attr('src') );
-            } // end if else
-          });// end nested one click
-        } else {
-          $('#picOptions').slideUp( );
-          $('#imgIn').val( $(this).attr('src') );
-        }
-      }); //end one click
+}// end updateDeleteOptions()
 
-  });// end ajax
-}; // end picOptions
+var setUpOptions = function(){
+  var outputText = '<option value=NULL>--Select a Color--</option>';
+  for (var i = 0; i < colors.length; i++) {
+    outputText += '<option value=' + colors[i] + '>' + addSpaces(colors[i]) + '</option>';
+  } // end for
+  $('#colorIn, #colorOption').html(outputText);
 
+  outputText = '<option value=NULL>--Select a Size--</option>';
+  for (var i = 0; i < sizes.length; i++) {
+    outputText += '<option value=' + sizes[i] + '>' + addSpaces(sizes[i]) + '</option>';
+  } // end for
+  $('#sizeIn, #sizeOption' ).html(outputText);
 
-//=============================================================//
+};//end setUpOptions();
+
+//==============================================================
+//==============================================================
 var init = function(){
   ////when doc is ready////
   // set search to 'by type'

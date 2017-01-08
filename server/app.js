@@ -2,7 +2,7 @@ var express = require( 'express' );
 var app = express();
 var path = require( 'path' );
 var bodyParser = require( 'body-parser' );
-var urlEncodedParser = bodyParser.urlencoded( { extended: false } );
+var urlEncodedParser = bodyParser.urlencoded( { extended: true } );
 var pg = require( 'pg' );
 var port = process.env.PORT || 3003;
 var connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/inventory'
@@ -91,52 +91,51 @@ app.get( '/getInventory', function( req, res ){
   })// end connect
 }); // end addItem route
 
-//find object by name and size
-app.post( '/findObject', urlEncodedParser, function( req, res ){
-  console.log( 'findObject route hit:', req.body );
+//search DB object by either name, color, or size
+app.post( '/search', urlEncodedParser, function( req, res ){
+  console.log( 'search route hit:', req.body );
+  //create sql search string appending each search types
+  var searchedBy = ''; //variable passes info by which the search was made
+  var and = false; // variable tracks multiply inquiries to add an 'and'
+  var searchString = 'SELECT * FROM storeInventory WHERE';
+  if (req.body.name !== ''){
+    searchString+= ' name LIKE \'%' + req.body.name + '%\'';
+    searchedBy += 'name ("' +req.body.name+ '")';
+  } // end if name
+  if (req.body.color !== 'NULL'){
+    searchString+= ' color = \'' + req.body.color + '\'';
+    searchedBy += 'color (' +req.body.color+ ')';
+    and = true;
+  } // end if color
+  if (req.body.size !== 'NULL'){
+    if (and){
+      searchString+=' AND ';
+      searchedBy += ' and ';
+    } // end nested if and
+    searchString+= ' size = \'' + req.body.size + '\'';
+    searchedBy += 'size (' +req.body.size+ ')';
+  } // end if size
+  searchString+= ' ;';
   // connect to db
   pg.connect(connectionString, function( err, client, done ){
     if (err){
       console.log(err);
     } else {
       console.log('connected to DB');
-      var query = client.query( 'SELECT * FROM storeInventory where size=$1 AND color=$2', [req.body.size, req.body.color]);
+      var query = client.query( searchString );
       //array for list
       var matches = [];
       query.on( 'row', function( row ){
         matches.push (row);
-      });
+      }); // end 1st query.on
       query.on( 'end', function(){
-      done();
-      console.log( matches);
+        done();
+        res.send( {
+          searchedBy: searchedBy,
+          matches: matches
+        } );
 
-      res.send( matches);
-      });
-    } // end if else
-  });// end connect
-}); // end addItem route
-
-//find object by name and size
-app.post( '/findNamedObject', urlEncodedParser, function( req, res ){
-  console.log( 'findNamedObject route hit:', req.body );
-  // connect to db
-  pg.connect(connectionString, function( err, client, done ){
-    if (err){
-      console.log(err);
-    } else {
-      console.log('connected to DB');
-      var query = client.query( 'SELECT * FROM storeInventory WHERE name LIKE \'%' + req.body.name + '%\';');
-      //array for list
-      var matches = [];
-      query.on( 'row', function( row ){
-        matches.push (row);
-      });
-      query.on( 'end', function(){
-      done();
-      console.log( matches);
-
-      res.send( matches);
-      });
+      }); // end 2nd query.on
     } // end if else
   });// end connect
 }); // end addItem route
